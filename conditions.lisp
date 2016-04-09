@@ -1,0 +1,32 @@
+(in-package #:cl-tradier)
+
+(define-condition tradier-error (error)
+  ()
+  (:documentation "Base class for Tradier API errors."))
+
+(define-condition tradier-initialization-error (tradier-error)
+  ((message :initarg :message :initform nil :accessor message))
+  (:report (lambda (condition stream)
+	     (format stream (message condition)))))
+
+(define-condition tradier-response-error (tradier-error)
+  ((http-status-code :initarg :http-status-code :initform nil :accessor http-status-code)
+   (response-body :initarg :response-body :initform nil :accessor response-body)
+   (headers :initarg :headers :initform nil :accessor headers)
+   (uri :initarg :uri :initform nil :accessor uri)
+   (response-stream :initarg :response-stream :initform nil :accessor response-stream)
+   (close-stream-p :initarg :close-stream-p :initform nil :accessor close-stream-p)
+   (reason :initarg :reason :initform nil :accessor reason))
+  (:documentation "Conditions received from Tradier API responses."))
+
+(define-condition tradier-quota-error (tradier-response-error)
+  ((rate-limit-allowed :initarg :rate-limit-allowed :initform nil :accessor rate-limit-allowed)
+   (rate-limit-available :initarg :rate-limit-available :initform nil :accessor rate-limit-available)
+   (rate-limit-used :initarg :rate-limit-used :initform nil :accessor rate-limit-used)
+   (rate-limit-expiry :initarg :rate-limit-expiry :initform nil :accessor rate-limit-expiry))
+  (:report (lambda (condition stream)
+	     (format stream "Quota reached. Rate limit allowed: ~A. Available: ~A. Used: ~A. Expiry: ~A."
+		     (rate-limit-allowed condition)
+		     (rate-limit-available condition)
+		     (rate-limit-used condition)
+		     (rate-limit-expiry condition)))))

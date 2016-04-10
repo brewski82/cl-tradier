@@ -31,4 +31,6 @@ This client aims for extensibility. If, for example, you want to have all calls 
          (processed-response-body (cl-json:decode-json-from-string response-body)))
     (setf (first response-values) processed-response-body)
     (values-list response-values)))
+
+(cl-tradier:initialize-tradier-session :environment :sandbox :access-token "<secret-access-token>" :tradier-session-class 'my-tradier-session)
 ```
